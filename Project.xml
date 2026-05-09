@@ -11,6 +11,4 @@
     <haxelib name="flixel"/>
     <haxelib name="flixel-ui"/>
     <haxelib name="openfl"/>
-
-    <assets path="assets/images" rename="images"/>
 </project>
