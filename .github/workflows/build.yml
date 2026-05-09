@@ -85,7 +85,7 @@ jobs:
       - name: Upload Android Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Strident-Crisis-Shader-generator-android
+          name: dither-android
           path: export/android/bin/app/build/outputs/apk/
           if-no-files-found: error
           retention-days: 1
@@ -147,7 +147,7 @@ jobs:
       - name: Upload Windows Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Strident-Crisis-Shader-generator-windows
+          name: dither-windows
           path: export/windows/bin/
           if-no-files-found: error
           retention-days: 1
