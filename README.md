@@ -1,18 +1,9 @@
-# HaxeFlixel Dither Editor
+# Dither Editor
 
-Projeto simples de editor de imagens com efeito dither.
+Executar:
 
-## Instalar libs
-
-haxelib install flixel
-haxelib install flixel-ui
-haxelib install openfl
-haxelib install lime
-
-## Rodar
-
-lime test windows
+lime test html5
 
 ou
 
-lime test android
+lime test windows

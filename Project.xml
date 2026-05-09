@@ -13,5 +13,5 @@
     <haxelib name="openfl"/>
     <haxelib name="lime"/>
 
-    <assets path="assets"/>
+    <assets path="assets/images" rename="images"/>
 </project>

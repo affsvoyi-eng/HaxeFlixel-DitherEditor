@@ -10,6 +10,7 @@ import openfl.net.FileReference;
 import openfl.events.Event;
 import openfl.display.BitmapData;
 import openfl.utils.ByteArray;
+import openfl.display.PNGEncoderOptions;
 
 class PlayState extends FlxState
 {
@@ -111,7 +112,7 @@ class PlayState extends FlxState
 
         var pngBytes = image.pixels.encode(
             image.pixels.rect,
-            new openfl.display.PNGEncoderOptions()
+            new PNGEncoderOptions()
         );
 
         file.save(pngBytes, "dither.png");
