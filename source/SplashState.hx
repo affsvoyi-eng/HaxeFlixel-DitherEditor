@@ -1,4 +1,4 @@
-package states;
+package;
 
 import flixel.system.FlxSplash;
 import flixel.FlxG;
