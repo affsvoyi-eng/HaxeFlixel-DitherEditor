@@ -119,33 +119,59 @@ class PlayState extends FlxState
     }
 
     function applyDither()
+{
+    if (image.pixels == null)
+        return;
+
+    var original = image.pixels.clone();
+
+    var smallW = Std.int(original.width / pixelSize);
+    var smallH = Std.int(original.height / pixelSize);
+
+    if (smallW < 1) smallW = 1;
+    if (smallH < 1) smallH = 1;
+
+    var pixelated = new BitmapData(smallW, smallH, false, 0x000000);
+
+    pixelated.draw(original);
+
+    var finalBmp = new BitmapData(
+        original.width,
+        original.height,
+        false,
+        0x000000
+    );
+
+    finalBmp.draw(pixelated, null, null, null,
+        new Rectangle(0, 0, original.width, original.height), false);
+
+    for (y in 0...finalBmp.height)
     {
-        if (image.pixels == null)
-            return;
-
-        var bmp = image.pixels.clone();
-
-        for (y in 0...bmp.height)
+        for (x in 0...finalBmp.width)
         {
-            for (x in 0...bmp.width)
-            {
-                var pixel = bmp.getPixel(x, y);
+            var pixel = finalBmp.getPixel(x, y);
 
-                var r = (pixel >> 16) & 0xFF;
-                var g = (pixel >> 8) & 0xFF;
-                var b = pixel & 0xFF;
+            var r = (pixel >> 16) & 0xFF;
+            var g = (pixel >> 8) & 0xFF;
+            var b = pixel & 0xFF;
 
-                var gray = Std.int((r + g + b) / 3);
+            var noise = ((x + y) % 2 == 0)
+                ? ditherStrength
+                : -ditherStrength;
 
-                var newColor = gray > ditherStrength ? 255 : 0;
+            r = Std.int(Math.max(0, Math.min(255, r + noise)));
+            g = Std.int(Math.max(0, Math.min(255, g + noise)));
+            b = Std.int(Math.max(0, Math.min(255, b + noise)));
 
-                bmp.setPixel(x, y,
-                    (newColor << 16) |
-                    (newColor << 8) |
-                    newColor);
-            }
+            finalBmp.setPixel(x, y,
+                (r << 16) |
+                (g << 8) |
+                b);
         }
-
-        image.pixels = bmp;
     }
+
+    image.loadGraphic(finalBmp);
+
+    image.screenCenter();
+  }
 }
