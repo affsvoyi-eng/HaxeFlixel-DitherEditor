@@ -4,14 +4,13 @@
 
     <app main="Main" file="DitherEditor" path="export" />
 
-    <window width="1280" height="720" fps="60" background="#202020"/>
+    <window width="1280" height="720" fps="" background="#202020"/>
 
     <source path="source"/>
 
     <haxelib name="flixel"/>
     <haxelib name="flixel-ui"/>
     <haxelib name="openfl"/>
-    <haxelib name="lime"/>
 
     <assets path="assets/images" rename="images"/>
 </project>
