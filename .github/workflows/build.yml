@@ -1,0 +1,153 @@
+name: Build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  Android:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Haxe
+        uses: krdlab/setup-haxe@v1
+        with:
+          haxe-version: 4.2.5
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Setup Haxelib
+        run: |
+          mkdir -p ~/haxelib
+          haxelib setup ~/haxelib
+
+      - name: Cache Android Build
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/haxelib
+            ~/.lime
+            ~/.gradle/caches
+            ~/.android/build-cache
+            export
+          key: android-${{ runner.os }}-${{ hashFiles('**/Project.xml') }}
+          restore-keys: |
+            android-${{ runner.os }}-
+
+      - name: Install Android Dependencies
+        run: |
+          yes | sdkmanager --licenses
+          sdkmanager --update
+          sdkmanager \
+            "platform-tools" \
+            "platforms;android-30" \
+            "build-tools;30.0.3" \
+            "ndk;21.4.7075529" \
+            "cmake;3.18.1"
+
+      - name: Install Libraries
+        run: |
+          haxelib install lime --quiet
+          haxelib install openfl --quiet
+          haxelib install flixel --quiet
+          haxelib install flixel-tools --quiet
+          haxelib install flixel-addons --quiet
+          haxelib install hxcpp --quiet
+          haxelib install flixel-ui --quiet
+
+      - name: Run Lime Setup
+        shell: bash
+        run: |
+          haxelib run lime setup
+
+      - name: Configure Android
+        run: |
+          haxelib run lime config ANDROID_SDK $ANDROID_SDK_ROOT
+          haxelib run lime config ANDROID_NDK_ROOT "$ANDROID_SDK_ROOT/ndk/21.4.7075529"
+          haxelib run lime config JAVA_HOME $JAVA_HOME
+          haxelib run lime config ANDROID_SETUP true
+
+      - name: Build Android
+        run: |
+          haxelib run lime build android
+
+      - name: Upload Android Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Strident-Crisis-Shader-generator-android
+          path: export/android/bin/app/build/outputs/apk/
+          if-no-files-found: error
+          retention-days: 1
+
+  Windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Haxe
+        uses: krdlab/setup-haxe@v1
+        with:
+          haxe-version: 4.2.5
+
+      - name: Setup MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Setup Haxelib
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\haxelib"
+          haxelib setup "$env:USERPROFILE\haxelib"
+
+      - name: Cache Windows Build
+        uses: actions/cache@v4
+        with:
+          path: |
+            C:\Users\runneradmin\haxelib
+            C:\Users\runneradmin\.lime
+            export
+          key: windows-${{ runner.os }}-haxe4.2.5-${{ hashFiles('**/Project.xml', '**/*.hxml', '**/haxelib.json') }}
+          restore-keys: |
+            windows-${{ runner.os }}-haxe4.2.5-
+            windows-${{ runner.os }}-
+
+      - name: Install Libraries
+        shell: powershell
+        run: |
+          haxelib install lime --quiet
+          haxelib install openfl --quiet
+          haxelib install flixel --quiet
+          haxelib install flixel-addons --quiet
+          haxelib install flixel-tools --quiet
+          haxelib install hxcpp --quiet
+          haxelib install flixel-ui --quiet
+
+      - name: Run Lime Setup
+        shell: powershell
+        run: |
+          haxelib run lime setup
+
+      - name: Build Windows
+        shell: powershell
+        run: |
+          haxelib run lime build windows
+
+      - name: Upload Windows Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Strident-Crisis-Shader-generator-windows
+          path: export/windows/bin/
+          if-no-files-found: error
+          retention-days: 1
